@@ -8,19 +8,26 @@ import connectRedis from 'connect-redis'
 import cors from 'cors'
 import { redis } from './redis'
 import { RegisterResolver } from './modules/Register'
-//import { LoginResolver } from './modules/Login'
+import { LoginResolver } from './modules/Login'
+import { MeResolver } from './modules/Me'
+import { LogoutResolver } from './modules/Logout'
 
 const main = async () => {
     try {
         const RedisStore = connectRedis(session)
         await createConnection()
         const schema = await buildSchema({
-            resolvers: [RegisterResolver]
+            resolvers: [
+                RegisterResolver,
+                LoginResolver,
+                MeResolver,
+                LogoutResolver
+            ]
         })
         const apolloServer = new ApolloServer({
             schema,
             formatError: formatArgumentValidationError,
-            context: ({ req }: any) => ({ req })
+            context: ({ req, res }: any) => ({ request: req, response: res })
         })
 
         const app = Express()

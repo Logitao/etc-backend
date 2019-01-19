@@ -4,19 +4,19 @@ import { ApplicationContext } from '../types/ApplicationContext'
 import * as bcrypt from 'bcryptjs'
 
 @Resolver()
-export class Login {
+export class LoginResolver {
     @Mutation(() => User)
-    async resgister(
+    async login(
         @Arg('email') email: string,
         @Arg('password') password: string,
-        @Ctx() ctx: ApplicationContext
+        @Ctx() context: ApplicationContext
     ): Promise<User | null> {
         const user = await User.findOne({ where: { email } })
         if (!user) return null
 
         const valid = bcrypt.compare(password, user.password)
         if (!valid) return null
-        ctx.request.session!.userId = user.id
+        context.request.session!.userId = user.id
         return user
     }
 }

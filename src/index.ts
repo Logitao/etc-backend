@@ -15,7 +15,9 @@ import { LogoutResolver } from './modules/Logout'
 const main = async () => {
     try {
         const RedisStore = connectRedis(session)
+
         await createConnection()
+
         const schema = await buildSchema({
             resolvers: [
                 RegisterResolver,
@@ -27,14 +29,17 @@ const main = async () => {
         const apolloServer = new ApolloServer({
             schema,
             formatError: formatArgumentValidationError,
-            context: ({ req, res }: any) => ({ request: req, response: res })
+            context: ({ req, res }: any) => ({
+                request: req,
+                response: res
+            })
         })
 
         const app = Express()
         app.use(
             cors({
                 credentials: true,
-                origin: 'http://localhost:3000'
+                origin: 'http://localhost:8000'
             })
         )
         app.use(

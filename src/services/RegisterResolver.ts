@@ -1,7 +1,7 @@
 import { Arg, Mutation, Resolver, Query, UseMiddleware } from 'type-graphql'
 import * as bcrypt from 'bcryptjs'
 import { User } from '../entity/user/User'
-import { RegisterInput } from './register/RegisterInput'
+import { RegisterInput } from '../input/RegisterInput'
 import { IsAuth } from '../middleware/isAuth'
 
 @Resolver()

@@ -6,7 +6,8 @@ COPY . .
 
 RUN npm run build
 COPY ormconfig.json ./dist/
-WORKDIR ./dist
+WORKDIR /usr/src/app/dist
+
 
 EXPOSE 4000
-CMD node ./src/index.js
+CMD node ./src/index.js 

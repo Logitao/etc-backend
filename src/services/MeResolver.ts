@@ -1,6 +1,6 @@
 import { Ctx, Query, Resolver } from 'type-graphql'
 import { User } from '../entity/user/User'
-import { ApplicationContext } from '../types/ApplicationContext'
+import { ApplicationContext } from '../other/typescript/ApplicationContext'
 
 @Resolver()
 export class MeResolver {

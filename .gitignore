@@ -1,7 +1,12 @@
-./node_modules
-node_modules
 /node_modules
 /dist
 /pgdata
 /cache
 /redis-data
+
+# IDE CONFIG
+/.vscode
+/.idea
+
+# ENV
+.env

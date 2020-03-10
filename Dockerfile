@@ -1,13 +1,16 @@
-FROM node:10
-WORKDIR /usr/src/app
-COPY package*.json ./
-RUN npm install
+FROM node:12-alpine as builder
+WORKDIR /app
 COPY . .
-
+RUN npm install
 RUN npm run build
-COPY ormconfig.json ./dist/
-WORKDIR /usr/src/app/dist
 
+FROM node:12-alpine 
+ENV NODE_ENV=production
 
+WORKDIR /app
+COPY --from=builder app/dist /app/dist
+COPY --from=builder app/package*.json /app/
+
+RUN npm ci
 EXPOSE 4000
-CMD node ./src/index.js 
+CMD ["npm", "start"]

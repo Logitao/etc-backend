@@ -1,80 +1,50 @@
-import { ApolloServer } from 'apollo-server-express';
-import connectRedis from 'connect-redis';
-import cors from 'cors';
-import Express from 'express';
-import session from 'express-session';
-import 'reflect-metadata';
-import { buildSchema } from 'type-graphql';
-import { createConnection } from 'typeorm';
-import { redis } from './redis';
+require('dotenv').config()
 
+import { ApolloServer } from 'apollo-server-express'
+import cors from 'cors'
+import Express from 'express'
+import 'reflect-metadata'
+import { buildSchema } from 'type-graphql'
 
-const connect = async () => {
-    let retries = 5
+const bootstrap = async (): Promise<any> => {
+  try {
+    const extension = process.env.NODE_ENV === 'production' ? 'js' : 'ts'
+    const fullPath = `/services/*.${extension}`
 
-    while (retries > 0)
-        try {
-            await createConnection()
-            break
-        } catch (error) {
-            console.log(error)
-            retries--
-        }
-    return 0
-}
-const bootstrap = async () => {
-    try {
-        return await buildSchema({
-            resolvers: [__dirname + '/services/*.js']
-        })
-    } catch (error) {
-        console.log(error)
-        return undefined
-    }
+    return await buildSchema({
+      resolvers: [__dirname + fullPath]
+    })
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 const main = async () => {
-    await connect()
-    const schema = await bootstrap()
+  const schema = await bootstrap()
 
-    const RedisStore = connectRedis(session)
-
-    const apolloServer = new ApolloServer({
-        schema,
-        context: ({ req, res }: any) => ({
-            request: req,
-            response: res
-        })
+  const apolloServer = new ApolloServer({
+    schema,
+    context: ({ req, res }: any) => ({
+      request: req,
+      response: res
     })
+  })
 
-    const app = Express()
-    app.use(
-        cors({
-            credentials: true,
-            origin: 'http://localhost:8000'
-        })
-    )
-    app.use(
-        session({
-            store: new RedisStore({
-                client: redis as any
-            }),
-            name: 'qid',
-            secret: 'S3CR37',
-            resave: false,
-            saveUninitialized: false,
-            cookie: {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                maxAge: 1000 * 60 * 60 * 24 * 7 * 365 // 7 years
-            }
-        })
-    )
+  const app = Express()
 
-    apolloServer.applyMiddleware({ app })
-    app.listen(4000, () =>
-        console.log('Server started http://localhost:4000/graphql')
-    )
+  const frontendPort = process.env.FRONTEND_PORT || 3000
+  const serverPort = process.env.SERVER_PORT || 4000
+
+  app.use(cors({
+    credentials: true,
+    origin: ['*']
+  }))
+
+  apolloServer.applyMiddleware({ app })
+
+  app.listen(serverPort, () =>
+    console.log(`Server started http://0.0.0.0:${serverPort}/graphql`)
+  )
 }
 
 main()

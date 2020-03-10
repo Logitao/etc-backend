@@ -13,15 +13,15 @@ export class RegisterResolver {
     }
     @Mutation(() => User)
     async resgister(@Arg('data') data: RegisterInput): Promise<User | null> {
-        const findUser = await User.findOne({ where: { email: data.email } })
-        if (!findUser) {
-            return await User.create({
-                firstName: data.firstName,
-                lastName: data.lastName,
-                password: await bcrypt.hash(data.password, 12),
-                email: data.email
-            }).save()
-        }
+        //const findUser = await User.findOne({ where: { email: data.email } })
+        //if (!findUser) {
+        //    return await User.create({
+        //        firstName: data.firstName,
+        //        lastName: data.lastName,
+        //        password: await bcrypt.hash(data.password, 12),
+        //        email: data.email
+        //    }).save()
+        //}
         return null
     }
 }

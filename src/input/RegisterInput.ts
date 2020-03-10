@@ -1,6 +1,5 @@
 import { InputType, Field } from 'type-graphql'
 import { IsEmail, MinLength } from 'class-validator'
-import { EmailExist } from '../validation/EmailExists';
 
 @InputType()
 export class RegisterInput {
@@ -13,6 +12,5 @@ export class RegisterInput {
 
     @Field()
     @IsEmail(undefined, { message: 'Digite um email válido' })
-    @EmailExist()
     email: string
 }

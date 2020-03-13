@@ -1,29 +1,31 @@
-import { Arg, Ctx, Mutation, Resolver } from 'type-graphql'
+import { Arg, Mutation, Resolver } from 'type-graphql'
 import { User } from '../entity/user/User'
-import { ApplicationContext } from '../other/typescript/ApplicationContext'
+import Axios, { AxiosError } from 'axios'
+import { ApplicationError } from '../other/typescript/ApplicationError'
 
 // import * as bcrypt from 'bcryptjs'
 
 @Resolver()
 export class LoginResolver {
-  @Mutation(returns => User)
+  @Mutation(() => User)
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string,
-    @Ctx() context: ApplicationContext
-  ): Promise<User | null> {
-    //const user = await User.findOne({ where: { email } })
-    //if (!user) {
-    //    return null
-    //}
-
-    //const valid = await bcrypt.compare(password, user.password)
-    //if (!valid) {
-    //    return null
-    //}
-
-    //context.request.session!.userId = user.id
-    //return user
-    return null
+    @Arg('password') password: string
+  ): Promise<User> {
+    try {
+      const response = await Axios.post<User>('/users/login', {
+        email,
+        password
+      })
+      return response.data
+    } catch (err) {
+      if (typeof err.response === 'undefined') {
+        throw new ApplicationError()
+      } 
+      throw new ApplicationError({
+        ...err.response.data,
+        code: 'RESOURCE_NOT_FOUND'
+      })
+    }
   }
 }

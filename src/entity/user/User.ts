@@ -1,27 +1,57 @@
-import { ObjectType, Field, ID, Root } from 'type-graphql'
+import { ObjectType, Field, ID } from 'type-graphql'
+import { Address } from '../address/Address'
+import { Phone } from '../phone/Phone'
+import { Document } from '../document/Document'
+
+export enum Kinds {
+  NaturalPerson = 'natural_person',
+  LegalPerson = 'legal_person'
+}
 
 @ObjectType()
-export class User {
-    @Field(() => ID)
-    id: number
+export abstract class User {
+  @Field(() => ID)
+  _id: string
 
-    @Field()
-    password: string
+  @Field()
+  kind: Kinds
 
-    @Field()
-    email: string
+  @Field()
+  firstName: string
 
-    @Field()
-    firstName: string
+  @Field()
+  lastName: string
 
-    @Field()
-    lastName: string
+  @Field({ nullable: true })
+  birthDate: Date
 
-    @Field()
-    confirmed: boolean
+  @Field()
+  email: string
 
-    @Field()
-    fullName(@Root() parent: User): string {
-        return `${parent.firstName} ${parent.lastName}`
-    }
+  @Field(() => [Address])
+  addresses: Address[]
+
+  @Field(() => [Phone])
+  phones: Phone[]
+
+  @Field(() => [Document])
+  documents: Document[]
+
+  @Field()
+  prefLang: 'en_US' | 'pt_BR'
+
+  @Field(() => [String])
+  alternateLangs: string[]
+
+  @Field({ nullable: true })
+  internalNote?: string
+
+  @Field({ nullable: true })
+  externalCode?: string
+
+  @Field({ nullable: true })
+  createdAt?: string
+
+  @Field({ nullable: true })
+  updatedAt?: string
 }

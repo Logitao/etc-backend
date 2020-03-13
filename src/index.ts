@@ -1,10 +1,15 @@
 require('dotenv').config()
 
+import 'reflect-metadata'
+
 import { ApolloServer } from 'apollo-server-express'
+import { buildSchema } from 'type-graphql'
+
 import cors from 'cors'
 import Express from 'express'
-import 'reflect-metadata'
-import { buildSchema } from 'type-graphql'
+import axios from 'axios'
+
+axios.defaults.baseURL = process.env.PROCON_URL
 
 const bootstrap = async (): Promise<any> => {
   try {
@@ -27,18 +32,21 @@ const main = async () => {
     context: ({ req, res }: any) => ({
       request: req,
       response: res
-    })
+    }),
+    debug: false
   })
 
   const app = Express()
 
-  const frontendPort = process.env.FRONTEND_PORT || 3000
+  const frontendUrl = process.env.FRONTEND_URL
   const serverPort = process.env.SERVER_PORT || 4000
 
-  app.use(cors({
-    credentials: true,
-    origin: ['*']
-  }))
+  app.use(
+    cors({
+      credentials: true,
+      origin: frontendUrl || '*'
+    })
+  )
 
   apolloServer.applyMiddleware({ app })
 
